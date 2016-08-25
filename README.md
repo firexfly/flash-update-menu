@@ -6,8 +6,8 @@ flash-update-menu is a script which allows a user to update all their software f
 When the script also grew to include a way to keep the rest of the software on the system up to date, it was necessary to make it menu driven.
 
 ## Installation:
-`mkdir ${HOME}.update_menu`<br>
-`cd ${HOME}.update_menu`<br>
+`mkdir ${HOME}/.update_menu`<br>
+`cd ${HOME}/.update_menu`<br>
 `git clone https://github.com/firexfly/flash-update-menu.git`<br>
 `mv flash-update-menu/* .`<br>
 `rmdir flash-update-menu`
