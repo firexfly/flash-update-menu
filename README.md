@@ -6,16 +6,20 @@ flash-update-menu is a script which allows a user to update all their software f
 When the script also grew to include a way to keep the rest of the software on the system up to date, it was necessary to make it menu driven.
 
 ## Installation:
+Before starting make sure you are in the sudo group<br>
+Make sure you have installed git `sudo apt-get install git`<br>
 `mkdir ${HOME}/.update_menu`<br>
 `cd ${HOME}/.update_menu`<br>
 `git clone https://github.com/firexfly/flash-update-menu.git`<br>
-`mv flash-update-menu/* .`<br>
-`rmdir flash-update-menu`
+`mv flash-update-menu flash-update-menu_dir`<br>
+`mv flash-update-menu_dir/* .`<br>
+`rm -rf flash-update-menu_dir`
 
 #### Optional
 Create a .desktop:<br>
 `cd #To the location you want your .desktop to be.`<br>
 `touch flash-update-menu.desktop`<br>
+`chmod +x flash-update-menu.desktop`<br>
 Populate the file with the following lines (editing them for your own system):
 
 [Desktop Entry]<br>
@@ -30,10 +34,10 @@ Terminal=true
 
 ## Use:
 
-Either<br>
+Three possible ways to run the script:<br>
 	1 Double click flash-update-menu.desktop<br>
-	2 `./flash-update-menu.desktop`<br>
-	3 `${HOME}/.update_menu/flash-update-menu`
+	2 `${HOME}/.update_menu/flash-update-menu`<br>
+	3 `./flash-update-menu` (from .update_menu)
 
 This will present you with the main menu as follows:
 
@@ -42,9 +46,9 @@ This will present you with the main menu as follows:
 >    2. Update software (recommended)<br>
 >    3. dist-upgrade (see help for warnings)<br>
 >    0. EXIT
->
+
 >h for help
->
+
 >What would you like to do?
 
 Simply type in the option for the action you would like to carry out and follow the on-screen prompts.
