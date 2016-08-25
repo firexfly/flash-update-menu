@@ -1,0 +1,197 @@
+#!/bin/bash
+#
+## firexfly@users.noreply.github.com
+## flash-update-menu
+#
+# New BSD License (http://www.opensource.org/licenses/BSD-3-Clause)
+# Copyright (c) 2015, FireXfly
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification, 
+# are permitted provided that the following conditions are met:
+#
+#1. Redistributions of source code must retain the above copyright notice, this 
+#    list of conditions and the following disclaimer.
+#
+#2. Redistributions in binary form must reproduce the above copyright notice, 
+#    this list of conditions and the following disclaimer in the documentation 
+#    and/or other materials provided with the distribution.
+#
+#3. Neither the name of the copyright holder nor the names of its contributors 
+#    may be used to endorse or promote products derived from this software 
+#    without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS 
+# OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY 
+# AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER 
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT 
+# OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+set -e
+
+
+# Option 1 --- Update Adobe Flash Player
+flash_update () {
+    # Remove system plugin if installed/
+    if [ -e /usr/lib/mozilla/plugins/libflashplayer.so ]; then
+	echo "The plugin is currently installed in the system plugin directory."
+	echo "Use of the system plugin directory is depreciated by this script..."
+	echo "Please enter your user password to remove the plugin from the system directory."
+	sudo rm /usr/lib/mozilla/plugins/libflashplayer.so
+    fi
+    # Make sure the script will run if there is no Flash plugin currently installed.
+    if [ ! -e ${HOME}/.mozilla/plugins ]; then
+	mkdir ${HOME}/.mozilla/plugins
+    fi
+    echo "Preparing to install latest Flash Player..."
+    if [ ! -d ${HOME}/.update_menu/version_data ]; then
+	mkdir -p ${HOME}/.update_menu/version_data
+    else >&2 echo "version_data already exists... skipping."
+    fi
+    echo "Checking for existing Flash plugin..."
+    if [ ! -e ${HOME}/.mozilla/plugins/libflashplayer.so ]; then
+	if [ "$(ls -A ${HOME}/.update_menu/version_data)" ]; then
+	    rm ${HOME}/.update_menu/version_data/*; else
+	    >&2 echo "No Flash plugin found in plugin directory. This may be the first time installing Flash Player."
+	fi
+    fi
+    # Get latest Flash version from user.
+    # If the latest version has already been downloaded, skip to installation.
+    echo "Please enter the latest Flash Player version, then press enter."
+    read latest_version
+    if [ -f ${HOME}/.update_menu/install_lock ] && [ $latest_version == `cat ${HOME}/.update_menu/install_lock` ]; then
+	echo "This version of Flash Player has already been downloadad... skipping to installation."
+	echo "Copying Flash plugin to plugin directory..."
+	cp ${HOME}/.update_menu/flash_data/libflashplayer.so ${HOME}/.mozilla/plugins/
+	echo "Copying local settings configuration files to /usr..."
+	echo "You must be root. Please enter your user password, then press enter."
+	sudo cp -r ${HOME}/.update_menu/flash_data/usr/* /usr
+	echo $latest_version > ${HOME}/.update_menu/version_data/flash_version
+	rm ${HOME}/.update_menu/install_lock
+	echo "Update complete!"
+	return 0
+    fi
+    # Remove old Flash data.
+    echo "Deleting old Flash data..."
+    if [ -s ${HOME}/.update_menu/version_data/flash_version ]; then
+	cat ${HOME}/.update_menu/version_data/flash_version > ${HOME}/.update_menu/version_data/flash_version_old; else
+	>&2 echo "No old Flash Player version detected. This may be the first time installing Flash Player."
+    fi
+    if [ ! -e ${HOME}/.update_menu/flash_data ]; then
+	mkdir ${HOME}/.update_menu/flash_data; else
+	rm -rf ${HOME}/.update_menu/flash_data/* || echo "flash_data already exists and is empty."
+    fi
+    # Verify system architecture is supported.
+    # If the architecture is not supported, print a message and exit.
+    arch_1=$(/usr/bin/arch)
+    if [[ $arch_1 = i*86 ]]; then
+	arch_1="i386"; elif
+	[ $arch_1 != x86_64 ]; then
+	>&2 echo "Your architecture $arch_1 is not supported... exiting."
+	return 0
+    fi
+    # If the user tries to download the version that is already installed, print a message and exit.
+    if [ -f ${HOME}/.update_menu/version_data/flash_version_old ] && [ $latest_version == `cat ${HOME}/.update_menu/version_data/flash_version_old` ]; then
+	>&2 echo "Flash Player is already at version ${latest_version}... exiting."
+	return 0; else
+	echo "Downloading latest Flash Player..."
+    fi
+    # Download, extract and install Flash Player.
+    wget -P ${HOME}/.update_menu/flash_data https://fpdownload.adobe.com/get/flashplayer/pdc/${latest_version}/install_flash_player_11_linux.${arch_1}.tar.gz
+    echo "Unpacking..."
+    tar -xvzf ${HOME}/.update_menu/flash_data/install_flash_player_11_linux.${arch_1}.tar.gz -C ${HOME}/.update_menu/flash_data
+    echo $latest_version > ${HOME}/.update_menu/install_lock
+    echo "Copying Flash plugin to the plugin directory..."
+    cp ${HOME}/.update_menu/flash_data/libflashplayer.so ${HOME}/.mozilla/plugins/
+    echo "Copying local settings configurations files to /usr..."
+    echo "You must be root. Please enter your user password, then press enter."
+    sudo cp -r ${HOME}/.update_menu/flash_data/usr/* /usr
+    echo $latest_version > ${HOME}/.update_menu/version_data/flash_version
+    rm ${HOME}/.update_menu/install_lock  
+    echo "Update complete!"
+    return 0
+}
+
+# Option 2 --- Update software
+update_software () {
+    sudo apt-get update || { >&2 echo 'update failed, seek assistance' ; return 0; }
+    sudo apt-get upgrade || { >&2 echo 'upgrade failed, seek assistance' ; return 0; }
+    echo "Software update successful."
+    return 0
+}
+
+# Option 3 --- dist-upgrade
+dist-upgrade_option () {
+    sudo apt-get update || { >&2 echo 'update failed, seek assistance' ; return 0; }
+    sudo apt-get dist-upgrade || { >&2 echo 'upgrade failed, seek assistance' ; return 0; }
+    echo "dist-upgrade successful."
+    return 0
+}
+
+# Menu
+menu () {
+    help_option="^[?|h|H]$|^\<help\>$|^\<Help\>$|^\<HELP\>$"
+    while [ "$choice" != 0 ]; do
+	echo "Menu"
+	echo "    1. Update/install Flash Player"
+	echo "    2. Update software (recommended)"
+	echo "    3. dist-upgrade (see help for warnings)"
+	echo "    0. EXIT"
+	echo "h for help"
+	echo
+	echo "What would you like to do?"
+	read choice
+
+	if [ $choice == 1 ]; then
+	    flash_update
+	    echo; elif
+	    [ $choice == 2 ]; then
+	    update_software
+	    echo; elif
+	    [ $choice == 3 ]; then
+	    dist-upgrade_option
+	    echo; elif
+	    [ $choice == 0 ]; then
+	    echo "Exiting..."
+	    echo; elif
+	    [[ $choice =~ $help_option ]]; then
+	    less ${HOME}/.update_menu/help.txt
+	    echo; else
+	    echo "Please enter a choice between 0 and 3 or type h for help."
+	    echo
+	fi
+    done
+}
+
+# Stop multiple instances of the script running simultaneously.
+script_name=`basename $0`
+pid_file=${script_name}.pid
+
+if [ -f /tmp/${pid_file} ]; then
+    # Verify if the process is actually still running under this pid.
+    old_pid=`cat /tmp/${pid_file}` || echo
+    result=`ps -ef | grep ${old_pid} | grep ${script_name}` || echo
+
+    if [ -n "${result}" ]; then
+	echo "Script already running! Exiting"
+	exit 255
+    fi
+
+fi
+
+# Grab pid of this process and update the pid file with it.
+pid=`echo "$$"`
+echo ${pid} > /tmp/${pid_file}
+
+# menu function.
+menu
+
+# Clean up and exit.
+if [ -f /tmp/${pid_file} ]; then
+    rm /tmp/${pid_file}
+fi
+exit 0

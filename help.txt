@@ -1,0 +1,73 @@
+flash-update-menu --- help
+-------------------------------------------------------------------------------
+
+Option ?, h, H, help, Help, HELP
+Display this help page in less
+-------------------------------------------------------------------------------
+
+Option 1
+This option is used to update Adobe Flash Player. If Flash Player is not
+already installed, it will install it.
+
+The version of Flash Player you want to install or upgrade to needs to be
+provided. You can find it here https://www.adobe.com/uk/software/flash/about/
+or, if you already have Flash Player installed, look for the Flash Player
+preferences (it may be in the Preferences menu), go to the advance tab and
+click the check now button under updates; this will take you to the same web
+page as above. You will find a table with the Flash Player versions; copy and
+paste the Firefox for Linux version number into the terminal that the script
+opens. The table on the Flash Player website looks something like this:
++-------+---------------------------------------------------+----------------+
+| Linux | Mozilla, Firefox-NPAPI (Extended Support Release) | Player version |
++-------+---------------------------------------------------+----------------+
+
+To complete the upgrade/installation, you must enter the password for your user
+and press enter to accept. You will not see the characters or asterisks when
+you type in your password; this is normal, your password is still being entered.
+
+The script will return to the main menu when complete.
+-------------------------------------------------------------------------------
+
+Option 2
+This is the recommended way to update all the software on the system (apart
+from Flash Player). This option will never install additional software or
+remove software that is no longer required. If an upgrade is necessary but
+additional software needs to be installed, the upgrade will be held back using
+this option; in that case you will need to use Option 3 --- dist-upgrade.
+
+For more information on the commands behind this option check out the man page
+
+man apt-get
+
+The options in this command are:
+update and upgrade.
+
+The script will return to the main menu when complete.
+-------------------------------------------------------------------------------
+
+Option 3
+This option will upgrade the software on your system and intelligently install
+or remove any software which is required or no longer required. It may also
+upgrade you to the latest distribution of Debian when it becomes availabe. This
+may be what you want but make sure you are ready for such a massive upgrade
+before undertaking it.
+
+For a start:
+Back up valuable data
+Read the release notes on https://www.debian.org/
+Have plenty of time on your hands
+
+For more information on the commands behind this option check out the man page
+
+man apt-get
+
+The options in this command are:
+update and dist-upgrade.
+-------------------------------------------------------------------------------
+
+To close this help page, type q
+
+
+New BSD License (http://www.opensource.org/licenses/BSD-3-Clause)
+
+fireXfly
