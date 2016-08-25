@@ -10,7 +10,7 @@ When the script also grew to include a way to keep the rest of the software on t
 `cd ${HOME}.update_menu`<br>
 `git clone https://github.com/firexfly/flash-update-menu.git`<br>
 `mv flash-update-menu/* .`<br>
-`rm flash-update-menu`
+`rmdir flash-update-menu`
 
 #### Optional
 Create a .desktop:<br>
