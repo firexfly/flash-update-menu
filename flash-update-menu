@@ -101,9 +101,9 @@ flash_update () {
 	echo "Downloading latest Flash Player..."
     fi
     # Download, extract and install Flash Player.
-    wget -P ${HOME}/.update_menu/flash_data https://fpdownload.adobe.com/get/flashplayer/pdc/${latest_version}/install_flash_player_11_linux.${arch_1}.tar.gz
+    wget -P ${HOME}/.update_menu/flash_data https://fpdownload.adobe.com/get/flashplayer/pdc/${latest_version}/flash_player_npapi_linux.${arch_1}.tar.gz
     echo "Unpacking..."
-    tar -xvzf ${HOME}/.update_menu/flash_data/install_flash_player_11_linux.${arch_1}.tar.gz -C ${HOME}/.update_menu/flash_data
+    tar -xvzf ${HOME}/.update_menu/flash_data/flash_player_npapi_linux.${arch_1}.tar.gz -C ${HOME}/.update_menu/flash_data
     echo $latest_version > ${HOME}/.update_menu/install_lock
     echo "Copying Flash plugin to the plugin directory..."
     cp ${HOME}/.update_menu/flash_data/libflashplayer.so ${HOME}/.mozilla/plugins/
