@@ -61,8 +61,12 @@ flash_update () {
     fi
     # Get latest Flash version from user.
     # If the latest version has already been downloaded, skip to installation.
-    echo "Please enter the latest Flash Player version, then press enter."
-    read latest_version
+    ### Edit to script - automatically check version
+    #echo "Please enter the latest Flash Player version, then press enter."
+    #read latest_version
+    ### Disabled prompt for version above.
+    echo "Checking latest Flash Player version..."
+    latest_version=$(wget -nv -O - http://get.adobe.com/flashplayer/about/ 2>/dev/null | grep -A 3 "Linux" | perl -lne 'print $1 if /([0-9]+.[0-9]+.[0-9]+.[0-9]+)/')
     if [ -f ${HOME}/.update_menu/install_lock ] && [ $latest_version == `cat ${HOME}/.update_menu/install_lock` ]; then
 	echo "This version of Flash Player has already been downloadad... skipping to installation."
 	echo "Copying Flash plugin to plugin directory..."
@@ -118,16 +122,16 @@ flash_update () {
 
 # Option 2 --- Update software
 update_software () {
-    sudo apt-get update || { >&2 echo 'update failed, seek assistance' ; return 0; }
-    sudo apt-get upgrade || { >&2 echo 'upgrade failed, seek assistance' ; return 0; }
+    sudo apt update || { >&2 echo 'update failed, seek assistance' ; return 0; }
+    sudo apt upgrade || { >&2 echo 'upgrade failed, seek assistance' ; return 0; }
     echo "Software update successful."
     return 0
 }
 
 # Option 3 --- dist-upgrade
 dist-upgrade_option () {
-    sudo apt-get update || { >&2 echo 'update failed, seek assistance' ; return 0; }
-    sudo apt-get dist-upgrade || { >&2 echo 'upgrade failed, seek assistance' ; return 0; }
+    sudo apt update || { >&2 echo 'update failed, seek assistance' ; return 0; }
+    sudo apt dist-upgrade || { >&2 echo 'upgrade failed, seek assistance' ; return 0; }
     echo "dist-upgrade successful."
     return 0
 }
